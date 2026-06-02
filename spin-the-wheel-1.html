@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Spin the Wheel — North Wales</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sky-top:#bdeafc;
+    --sky-bot:#fde9c8;
+    --sea:#3aa9b8;
+    --sea-dark:#2a8b99;
+    --sand:#f6d79b;
+    --grass:#7cc06a;
+    --ink:#2b2540;
+    --coat:#fdfdff;
+    --coat-shade:#e3e6f0;
+    --skin:#f6c9a4;
+    --skin-shade:#e8b48c;
+    --hair:#211d27;
+    --top:#e7657b;
+    --s1:#e76f51;
+    --s2:#f4a261;
+    --s3:#e9c46a;
+    --s4:#2a9d8f;
+    --s5:#33617a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:'Nunito',sans-serif;
+    background:linear-gradient(180deg,var(--sky-top) 0%,#cfeafc 45%,var(--sky-bot) 100%);
+    overflow:hidden;
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    display:flex;align-items:center;justify-content:center;
+  }
+  /* fixed-design stage that gets uniformly scaled to 1/5 of screen width */
+  #app{
+    position:relative;
+    width:1200px;height:760px;flex:0 0 auto;
+    background:linear-gradient(180deg,var(--sky-top) 0%,#cfeafc 45%,var(--sky-bot) 100%);
+    overflow:hidden;
+    transform-origin:center center;
+  }
+  /* sun */
+  .sun{position:absolute;top:6%;left:8%;width:90px;height:90px;border-radius:50%;
+    background:radial-gradient(circle at 40% 40%,#fff6d0,#ffd863);
+    box-shadow:0 0 60px 20px rgba(255,216,99,.45);animation:sunpulse 5s ease-in-out infinite}
+  @keyframes sunpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+  /* clouds */
+  .cloud{position:absolute;background:#fff;border-radius:50px;opacity:.9;filter:drop-shadow(0 6px 0 rgba(0,0,0,.04))}
+  .cloud:before,.cloud:after{content:"";position:absolute;background:#fff;border-radius:50%}
+  .c1{top:14%;left:60%;width:120px;height:34px;animation:drift 26s linear infinite}
+  .c1:before{width:46px;height:46px;top:-22px;left:18px}
+  .c1:after{width:60px;height:60px;top:-32px;left:50px}
+  .c2{top:24%;left:30%;width:90px;height:26px;animation:drift 34s linear infinite;opacity:.8}
+  .c2:before{width:34px;height:34px;top:-16px;left:14px}
+  .c2:after{width:46px;height:46px;top:-24px;left:40px}
+  @keyframes drift{from{transform:translateX(-30px)}to{transform:translateX(40px)}}
+
+  /* sea + hills + land at bottom for North Wales coast feel */
+  .scenery{position:absolute;left:0;right:0;bottom:0;height:38%;z-index:0}
+  .hill{position:absolute;bottom:30%;border-radius:50% 50% 0 0}
+  .hill.h1{left:-4%;width:46%;height:120px;background:#8fb98a}
+  .hill.h2{left:30%;width:50%;height:150px;background:#79a877}
+  .hill.h3{right:-6%;width:44%;height:110px;background:#8fb98a}
+  .sea{position:absolute;left:0;right:0;bottom:18%;height:14%;background:linear-gradient(180deg,var(--sea),var(--sea-dark))}
+  .ground{position:absolute;left:0;right:0;bottom:0;height:20%;background:linear-gradient(180deg,#8ed07a,var(--grass))}
+  .promenade{position:absolute;left:0;right:0;bottom:18%;height:3%;background:#e9dcc0}
+
+  .stage{position:relative;z-index:2;height:100%;display:flex;align-items:center;justify-content:center;gap:1.5rem;padding:1rem 3% 5%}
+
+  /* character */
+  .lady{width:300px;animation:idle 3.4s ease-in-out infinite;transform-origin:bottom center}
+  @keyframes idle{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-6px) rotate(-.6deg)}}
+  .lady .point-arm{transform-origin:128px 168px;animation:armidle 3.4s ease-in-out infinite}
+  @keyframes armidle{0%,100%{transform:rotate(0deg)}50%{transform:rotate(-4deg)}}
+  .lady.cheer{animation:cheer .6s ease}
+  @keyframes cheer{0%{transform:translateY(0)}30%{transform:translateY(-18px) rotate(-3deg)}60%{transform:translateY(-4px) rotate(2deg)}100%{transform:translateY(0)}}
+
+  /* wheel zone */
+  .wheelzone{position:relative;display:flex;flex-direction:column;align-items:center;gap:1rem}
+  .wheelwrap{position:relative;width:420px;aspect-ratio:1/1}
+  .pointer{position:absolute;top:-10px;left:50%;transform:translateX(-50%);z-index:5;
+    width:0;height:0;border-left:22px solid transparent;border-right:22px solid transparent;
+    border-top:38px solid #d4385a;filter:drop-shadow(0 4px 3px rgba(0,0,0,.25))}
+  .wheel{width:100%;height:100%;transition:transform 5.4s cubic-bezier(.17,.67,.16,1);filter:drop-shadow(0 14px 18px rgba(0,0,0,.22))}
+  .hub{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:4;
+    width:16%;height:16%;border-radius:50%;background:#fff;border:6px solid #2b2540;
+    display:flex;align-items:center;justify-content:center;box-shadow:0 4px 0 rgba(0,0,0,.15)}
+  .hub:after{content:"";width:38%;height:38%;border-radius:50%;background:#d4385a}
+
+  .panel{display:flex;flex-direction:column;align-items:center;gap:.6rem;z-index:3}
+  h1{font-family:'Fredoka',sans-serif;font-weight:700;font-size:2.4rem;
+    color:#fff;text-shadow:0 3px 0 #d4385a,0 5px 8px rgba(0,0,0,.2);letter-spacing:.5px;text-align:center}
+  h1 span{color:#ffe27a}
+  .spinbtn{font-family:'Fredoka',sans-serif;font-weight:700;font-size:1.3rem;color:#fff;
+    background:linear-gradient(180deg,#ff7a5c,#e7503a);border:none;border-radius:999px;
+    padding:.7rem 2.4rem;cursor:pointer;box-shadow:0 6px 0 #b53a28,0 10px 14px rgba(0,0,0,.25);
+    transition:transform .08s,box-shadow .08s;letter-spacing:.5px}
+  .spinbtn:active{transform:translateY(4px);box-shadow:0 2px 0 #b53a28,0 5px 8px rgba(0,0,0,.25)}
+  .spinbtn:disabled{filter:grayscale(.4) brightness(.95);cursor:not-allowed}
+  .result{font-family:'Fredoka',sans-serif;font-weight:600;min-height:2rem;font-size:1.25rem;color:var(--ink);
+    background:#fff;padding:.35rem 1.1rem;border-radius:999px;box-shadow:0 4px 0 rgba(0,0,0,.12);
+    opacity:0;transform:scale(.7);transition:.3s}
+  .result.show{opacity:1;transform:scale(1)}
+  .result b{color:#e7503a}
+
+  /* confetti */
+  .confetti{position:absolute;inset:0;pointer-events:none;z-index:9;overflow:hidden}
+  .confetti i{position:absolute;top:-20px;width:11px;height:16px;opacity:0;border-radius:2px}
+</style>
+</head>
+<body>
+  <div id="app">
+  <div class="sun"></div>
+  <div class="cloud c1"></div>
+  <div class="cloud c2"></div>
+  <div class="scenery">
+    <div class="hill h1"></div><div class="hill h2"></div><div class="hill h3"></div>
+    <div class="sea"></div><div class="promenade"></div><div class="ground"></div>
+  </div>
+
+  <div class="stage">
+    <!-- WOMAN -->
+    <svg class="lady" viewBox="0 0 240 380" aria-label="Cartoon scientist">
+      <ellipse cx="120" cy="366" rx="78" ry="12" fill="rgba(0,0,0,.12)"/>
+      <!-- legs -->
+      <rect x="96" y="296" width="20" height="62" rx="9" fill="#5b6b86"/>
+      <rect x="124" y="296" width="20" height="62" rx="9" fill="#516079"/>
+      <ellipse cx="104" cy="362" rx="18" ry="9" fill="#33384a"/>
+      <ellipse cx="136" cy="362" rx="18" ry="9" fill="#33384a"/>
+      <!-- coat body -->
+      <path d="M70 178 Q70 150 96 144 L144 144 Q170 150 170 178 L176 300 Q120 318 64 300 Z" fill="var(--coat)" stroke="var(--coat-shade)" stroke-width="2"/>
+      <!-- coloured top underneath (V) -->
+      <path d="M104 146 L120 196 L136 146 Z" fill="var(--top)"/>
+      <!-- coat lapels -->
+      <path d="M118 146 L96 146 Q92 200 110 250 L120 196 Z" fill="#fff" stroke="var(--coat-shade)" stroke-width="2"/>
+      <path d="M122 146 L144 146 Q148 200 130 250 L120 196 Z" fill="#f4f6fb" stroke="var(--coat-shade)" stroke-width="2"/>
+      <!-- buttons -->
+      <circle cx="120" cy="214" r="3.4" fill="#c9cee0"/>
+      <circle cx="120" cy="240" r="3.4" fill="#c9cee0"/>
+      <circle cx="120" cy="266" r="3.4" fill="#c9cee0"/>
+      <!-- pocket + pen -->
+      <rect x="138" y="232" width="30" height="26" rx="4" fill="#fff" stroke="var(--coat-shade)" stroke-width="2"/>
+      <rect x="150" y="226" width="4" height="16" rx="2" fill="#2a9d8f"/>
+      <!-- left arm (her right), resting -->
+      <path d="M74 182 Q56 220 62 270 Q63 286 78 286 Q88 286 86 270 Q82 226 96 196 Z" fill="var(--coat)" stroke="var(--coat-shade)" stroke-width="2"/>
+      <circle cx="72" cy="282" r="13" fill="var(--skin)"/>
+      <!-- right arm (pointing toward wheel) -->
+      <g class="point-arm">
+        <path d="M150 158 Q196 150 224 138 Q236 134 234 124 Q231 113 220 117 Q190 128 152 138 Q140 150 150 168 Z" fill="var(--coat)" stroke="var(--coat-shade)" stroke-width="2"/>
+        <circle cx="226" cy="124" r="14" fill="var(--skin)"/>
+        <!-- pointing finger -->
+        <rect x="234" y="118" width="18" height="9" rx="4.5" fill="var(--skin)"/>
+      </g>
+      <!-- neck -->
+      <rect x="110" y="128" width="20" height="22" rx="8" fill="var(--skin-shade)"/>
+      <!-- hair back mass + medium length -->
+      <path d="M70 86 Q66 150 84 176 L96 150 Q84 120 88 92 Z" fill="var(--hair)"/>
+      <path d="M170 86 Q174 150 156 176 L144 150 Q156 120 152 92 Z" fill="var(--hair)"/>
+      <!-- ponytail (bobble) up top-right -->
+      <path d="M150 44 Q196 18 206 44 Q212 64 184 70 Q160 74 150 64 Z" fill="var(--hair)"/>
+      <!-- bobble / hair tie -->
+      <circle cx="150" cy="54" r="9" fill="#e7657b" stroke="#c44a60" stroke-width="2"/>
+      <!-- head -->
+      <circle cx="120" cy="92" r="46" fill="var(--skin)"/>
+      <!-- hair top fringe -->
+      <path d="M74 92 Q70 44 120 44 Q170 44 166 92 Q150 66 120 66 Q90 66 74 92 Z" fill="var(--hair)"/>
+      <path d="M74 92 Q78 70 92 62 Q86 84 96 100 Q82 100 74 92 Z" fill="var(--hair)"/>
+      <!-- face -->
+      <circle cx="104" cy="94" r="5.2" fill="var(--ink)"/>
+      <circle cx="138" cy="94" r="5.2" fill="var(--ink)"/>
+      <circle cx="102.5" cy="92.3" r="1.7" fill="#fff"/>
+      <circle cx="136.5" cy="92.3" r="1.7" fill="#fff"/>
+      <path d="M96 84 Q104 80 112 84" stroke="var(--hair)" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+      <path d="M130 84 Q138 80 146 84" stroke="var(--hair)" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+      <circle cx="92" cy="108" r="7" fill="#f6a98f" opacity=".6"/>
+      <circle cx="150" cy="108" r="7" fill="#f6a98f" opacity=".6"/>
+      <path d="M121 100 q4 3 0 6" stroke="var(--skin-shade)" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <path d="M106 116 Q120 128 136 116" stroke="#c0506a" stroke-width="3.4" fill="none" stroke-linecap="round"/>
+    </svg>
+
+    <!-- WHEEL -->
+    <div class="wheelzone">
+      <div class="panel">
+        <h1>Where's <span>Sam</span> going next?</h1>
+      </div>
+      <div class="wheelwrap">
+        <div class="pointer"></div>
+        <svg class="wheel" id="wheel" viewBox="0 0 300 300"></svg>
+        <div class="hub"></div>
+      </div>
+      <button class="spinbtn" id="spin">SPIN!</button>
+      <div class="result" id="result"></div>
+    </div>
+  </div>
+
+  <div class="confetti" id="confetti"></div>
+  </div>
+
+<script>
+// Scale the fixed 1200x760 design so its rendered width = 100% of the screen width.
+const app = document.getElementById('app');
+const DESIGN_W = 1200;
+function fitToWidth(){
+  const scale = window.innerWidth / DESIGN_W;
+  app.style.transform = `scale(${scale})`;
+}
+fitToWidth();
+window.addEventListener('resize', fitToWidth);
+
+const towns = ["Caernarfon","Colwyn Bay","Bangor","Rhyl","Llandudno"];
+const colors = ["#e76f51","#f4a261","#e9c46a","#2a9d8f","#33617a"];
+const textColors = ["#fff","#3a2a18","#3a2a18","#fff","#fff"];
+const N = towns.length, seg = 360 / N, R = 150, cx = 150, cy = 150;
+
+function xy(deg, r){
+  const t = (deg - 90) * Math.PI / 180;
+  return [cx + r * Math.cos(t), cy + r * Math.sin(t)];
+}
+
+// build wheel
+const wheel = document.getElementById('wheel');
+let svg = "";
+for (let i = 0; i < N; i++){
+  const a1 = i * seg, a2 = (i + 1) * seg;
+  const [x1, y1] = xy(a1, R), [x2, y2] = xy(a2, R);
+  svg += `<path d="M${cx} ${cy} L${x1.toFixed(2)} ${y1.toFixed(2)} A${R} ${R} 0 0 1 ${x2.toFixed(2)} ${y2.toFixed(2)} Z" fill="${colors[i]}" stroke="#fff" stroke-width="3"/>`;
+}
+// outer ring
+svg += `<circle cx="${cx}" cy="${cy}" r="${R-1.5}" fill="none" stroke="#2b2540" stroke-width="6"/>`;
+// dots on rim
+for (let i = 0; i < N; i++){
+  const [dx, dy] = xy(i * seg, R - 1.5);
+  svg += `<circle cx="${dx.toFixed(2)}" cy="${dy.toFixed(2)}" r="4" fill="#fff" stroke="#2b2540" stroke-width="1.5"/>`;
+}
+// labels
+for (let i = 0; i < N; i++){
+  const mid = i * seg + seg / 2;
+  svg += `<g transform="rotate(${mid} ${cx} ${cy})">
+    <text x="${cx}" y="${cy - R + 34}" text-anchor="middle" font-family="Fredoka, sans-serif"
+      font-weight="600" font-size="17" fill="${textColors[i]}" transform="rotate(0 ${cx} ${cy-R+34})">${towns[i]}</text>
+  </g>`;
+}
+wheel.innerHTML = svg;
+
+// spin logic
+let rotation = 0, spinning = false;
+const btn = document.getElementById('spin');
+const resultEl = document.getElementById('result');
+const lady = document.querySelector('.lady');
+
+function spin(){
+  if (spinning) return;
+  spinning = true;
+  btn.disabled = true;
+  resultEl.classList.remove('show');
+
+  const chosen = Math.floor(Math.random() * N);
+  const centerOffset = chosen * seg + seg / 2;     // clockwise from top, in wheel coords
+  const targetMod = ((360 - centerOffset) % 360 + 360) % 360;
+  const currentMod = ((rotation % 360) + 360) % 360;
+  let delta = targetMod - currentMod;
+  if (delta < 0) delta += 360;
+  rotation += 360 * 6 + delta;
+  wheel.style.transform = `rotate(${rotation}deg)`;
+
+  setTimeout(() => {
+    spinning = false;
+    btn.disabled = false;
+    resultEl.innerHTML = `We're off to <b>${towns[chosen]}</b>! 🎉`;
+    resultEl.classList.add('show');
+    lady.classList.add('cheer');
+    setTimeout(() => lady.classList.remove('cheer'), 600);
+    burst();
+  }, 5500);
+}
+
+btn.addEventListener('click', spin);
+wheel.addEventListener('click', spin);
+
+// confetti
+const conf = document.getElementById('confetti');
+const cc = ["#e76f51","#f4a261","#e9c46a","#2a9d8f","#e7657b","#ffe27a","#fff"];
+function burst(){
+  for (let i = 0; i < 70; i++){
+    const p = document.createElement('i');
+    p.style.background = cc[i % cc.length];
+    p.style.left = Math.random() * 1200 + 'px';
+    const dur = 1.6 + Math.random() * 1.6;
+    const delay = Math.random() * .3;
+    p.style.transform = `rotate(${Math.random()*360}deg)`;
+    p.animate([
+      {transform:`translateY(-20px) rotate(0deg)`, opacity:1},
+      {transform:`translateY(780px) rotate(${720+Math.random()*360}deg)`, opacity:1}
+    ], {duration: dur*1000, delay: delay*1000, easing:'cubic-bezier(.3,.6,.5,1)'});
+    conf.appendChild(p);
+    setTimeout(() => p.remove(), (dur+delay)*1000+100);
+  }
+}
+
+// auto-play once so it feels like a little video
+window.addEventListener('load', () => setTimeout(spin, 900));
+</script>
+</body>
+</html>
